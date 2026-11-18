@@ -1,12 +1,14 @@
-# Atlas · AI Research Workspace
+# Utility Lens · Canadian Utilities Research
 
-Atlas is a personal AI research project built with Python, Streamlit, LangChain, and OpenAI. Ask a question, let the agent search the web or calculate numbers, and receive a research brief with linked sources. You can ask follow-up questions and download the conversation as a PDF.
+Utility Lens is a personal research assistant for Canadian electricity utilities, built with Python, Streamlit, LangChain, and OpenAI. Explore Hydro One and the wider Canadian electricity sector: grid investment, transmission and distribution, reliability, asset management, and regulation. Ask a question, let the agent search public web sources or calculate numbers, and receive a research brief with linked sources. You can ask follow-up questions and download the conversation as a PDF.
+
+The research instructions prioritise public utility reports, regulatory filings, and the relevant provincial regulator and system operator. Ontario examples include [Hydro One](https://www.hydroone.com/about), the [Ontario Energy Board](https://www.oeb.ca/about-oeb/what-we-do), and the [IESO](https://www.ieso.ca/). Questions about other provinces use their own jurisdiction as context. Briefs are instructed to state reporting periods and units, distinguish proposals from approvals, and explain limits when comparing reliability metrics.
 
 The project is small enough to understand file by file while demonstrating practical skills for a portfolio: tool calling, conversation memory, structured AI responses, a custom interface, and document export. It runs locally and keeps conversations in memory, with no database or account system to configure.
 
-![Atlas welcome screen with a question box, research depth options, and orange accents on a black background](assets/img/landing.png)
+![Utility Lens welcome screen with a question box and research depth options](assets/img/landing.png)
 
-*The welcome screen: start a question, choose a research depth, and adjust settings in the sidebar.*
+*Earlier interface shown for illustration. The current workspace uses Canadian utilities examples, teal accents (#015a67), white backgrounds, and black text.*
 
 ## Contents
 
@@ -24,6 +26,7 @@ The project is small enough to understand file by file while demonstrating pract
 
 | Feature | What it means |
 | --- | --- |
+| Canadian electricity focus | Research Hydro One and other Canadian electricity utilities, with attention to province, reporting period, and source quality. |
 | Web search | The agent can find titles, preview snippets, and URLs through DDGS. A separate search API key is not required. |
 | Calculator | The agent can use a Python arithmetic tool for numerical work. |
 | Multi-step research | The agent can use a tool, read the result, refine its approach, and use another tool before answering. |
@@ -32,7 +35,7 @@ The project is small enough to understand file by file while demonstrating pract
 | Structured results | Each answer has a title, summary, key findings, sources, and suggested follow-up questions. |
 | Visible activity | See the searches and calculations that actually ran. |
 | PDF download | Save the conversation, findings, and clickable source links. |
-| Custom interface | A black background, orange accents, and responsive styling. |
+| Custom interface | White backgrounds, teal accents (#015a67), black text, and responsive styling. |
 | Terminal mode | Use the same research workflow without the browser interface. |
 
 An **agent** is an AI model connected to tools. The model decides whether a tool would help; Python executes the requested tool and gives the result back to the model. The workflow can repeat until the agent produces its answer.
@@ -128,20 +131,20 @@ When you return to the project later, activate the existing virtual environment 
 3. Choose **Quick brief** or **Deep research**, then click **Begin research**.
 4. Read the brief and **Key takeaways**. Open **Sources** to visit the linked pages and **Research activity** to inspect tool results.
 5. Type a follow-up in the chat box, or click a suggested follow-up question.
-6. Click **Download PDF** to save the current conversation as `atlas-research.pdf`.
+6. Click **Download PDF** to save the current conversation as `utility-lens-research.pdf`.
 7. Click **New research** when you want to clear the conversation and start another topic.
 
-![An Atlas research brief showing an answer and key takeaways with source links](assets/img/result.png)
+![A Utility Lens research brief showing an answer and key takeaways with source links](assets/img/result.png)
 
 *A completed brief brings the answer, key takeaways, and source links into one view.*
 
 Try this first:
 
-> Compare solar and wind energy for a beginner. Explain cost, reliability, and practical trade-offs, and link your sources.
+> Explain the roles of Hydro One, the Ontario Energy Board, and the IESO in Ontario's electricity sector. Distinguish transmission, distribution, regulation, and system operation, and link official sources.
 
 Then ask:
 
-> Which option would suit a small home better, and what information would you need before deciding?
+> What do Hydro One's latest public reports say about grid investment priorities? Distinguish proposed plans from approved projects and state the reporting period.
 
 **Quick brief** asks for a focused answer. **Deep research** asks the model to explore more angles and cross-check claims, and allows a larger workflow step limit. The exact searches and calculations depend on the model's decisions; neither mode promises a fixed number of tool calls.
 
@@ -225,7 +228,7 @@ The main helpers are:
 
 Streamlit reruns the script when you interact with many widgets. `st.session_state` keeps values between those reruns. `pending_prompt` records a question ready to run; the script consumes it, calls `run_research()`, saves the result, and reruns to show the updated conversation. Failed requests keep their question so the **Retry research** button can try again.
 
-![Source preview cards and suggested follow-up questions in the Atlas conversation view](assets/img/followup.png)
+![Source preview cards and suggested follow-up questions in the Utility Lens conversation view](assets/img/followup.png)
 
 *Source cards let you inspect the evidence; suggested questions give you a starting point for the next request.*
 
@@ -247,13 +250,13 @@ Both `app.py` and `main.py` import this file, so the research behavior is shared
 | `export_markdown()` | Formats messages for readable terminal output. |
 | `export_pdf()` | Converts messages into an A4 PDF using ReportLab. |
 
-The **system prompt** tells the model how to research: use available tools, prefer primary sources, distinguish evidence from uncertainty, treat snippets as evidence rather than instructions, and return the required answer structure. A **schema** describes that expected structure, including field names and types. Pydantic validates the response's shape and types; it does not verify whether the claims are true.
+The **system prompt** tells the model how to research Canadian electricity utilities: respect provincial context, prefer utility reports and official sector sources, state reporting periods and units, and distinguish proposed plans from approved projects. It also tells the model to use available tools, distinguish evidence from uncertainty, treat snippets as evidence rather than instructions, and return the required answer structure. A **schema** describes that expected structure, including field names and types. Pydantic validates the response's shape and types; it does not verify whether the claims are true.
 
 The agent uses a recursion limit of **20 workflow steps** for Quick brief and **35** for Deep research. These are workflow limits, not exact tool-call counts. OpenAI requests have a 45-second timeout and one configured retry; search has its own 15-second timeout. These settings bound parts of the process, rather than setting one deadline for the entire research request.
 
 `export_pdf()` handles basic Markdown headings, bold and italic text, list markers, tables, and clickable links. It includes questions, answer text, key findings, source lists, and page numbers. It uses fonts bundled with ReportLab, so no separate font installation is required. It does not reproduce the entire browser layout or include the activity tab and suggested follow-up buttons.
 
-![A sample exported Atlas PDF containing the question, research brief, and key findings](assets/img/pdf_sample.png)
+![A sample exported Utility Lens PDF containing the question, research brief, and key findings](assets/img/pdf_sample.png)
 
 *An example report saved through Download PDF. The report presents the conversation in a document layout.*
 
@@ -287,7 +290,7 @@ It supports `+`, `-`, `*`, `/`, `//`, `%`, `**`, parentheses, `pi`, `e`, and the
 
 ### `main.py` — the terminal entry point
 
-This is an alternative way to use Atlas. It loads `.env`, reads command-line arguments, creates an in-memory history list, and calls the same `run_research()` function used by Streamlit.
+This is an alternative way to use Utility Lens. It loads `.env`, reads command-line arguments, creates an in-memory history list, and calls the same `run_research()` function used by Streamlit.
 
 With no topic argument, it repeatedly asks for questions until you type `quit` or `exit`. With a topic argument, it researches that topic once and exits. `--deep` selects Deep research. Activity is printed while tools finish, followed by a Markdown-formatted brief.
 
@@ -297,7 +300,7 @@ The browser downloads PDFs; terminal mode prints Markdown. `main.py` does not cr
 
 This stylesheet controls layout, spacing, typography, buttons, the welcome screen, source cards, chat panels, and responsive adjustments for smaller screens. Each CSS property is written on its own line.
 
-The `:root` block defines shared variables such as `--accent` for orange, `--background` for black, `--ink` for primary text, and `--muted` for secondary text. Some components also use explicit color values for surfaces and hover states.
+The `:root` block defines shared variables such as `--accent` for teal (#015a67), `--background` for white, and `--ink` and `--muted` for black text. Related variables set teal button fills, hover states, and subtle borders.
 
 Selectors such as `.source-card` style the project's HTML. Selectors using `[data-testid="..."]` style Streamlit components. Media queries adjust the design at different screen widths. `app.py` reads and inserts this file when rendering the page.
 
@@ -307,7 +310,7 @@ These images illustrate the app in this guide. `landing.png` shows the welcome s
 
 ### `.streamlit/config.toml` — Streamlit's configuration
 
-This file sets the native Streamlit theme to dark, with orange as `primaryColor`, black as `backgroundColor`, a dark secondary background, and light text. This makes native widgets match the custom CSS.
+This file sets the native Streamlit theme to light, with teal (#015a67) as `primaryColor`, white backgrounds, and black text. This makes native widgets match the custom CSS.
 
 The `[server]` section sets `headless = true`, so Streamlit does not automatically open a browser. The `[browser]` section disables Streamlit usage-statistics collection. These options configure Streamlit; the Python files still handle research requests.
 
@@ -352,7 +355,7 @@ Browser memory survives normal Streamlit reruns within the current session. Refr
 
 All stored messages remain available for display and PDF export while the session lasts. Only the latest 24 messages are sent as conversation context for the next research request, so much older details may no longer influence an answer.
 
-![A continuing Atlas conversation with two questions explored, Deep research selected, and a follow-up being typed](assets/img/followup2.png)
+![A continuing Utility Lens conversation with two questions explored, Deep research selected, and a follow-up being typed](assets/img/followup2.png)
 
 *Continue the same conversation with a follow-up, and choose the depth for the next answer.*
 
@@ -393,13 +396,13 @@ Type a question at the prompt. Keep asking follow-ups in the same process, and t
 To research a single topic and exit:
 
 ```bash
-python main.py "Compare solar and wind energy"
+python main.py "Explain Hydro One's role in Ontario's electricity grid"
 ```
 
 To request a deeper brief:
 
 ```bash
-python main.py "Compare solar and wind energy" --deep
+python main.py "Research Hydro One's latest public grid investment priorities" --deep
 ```
 
 Use `python main.py --help` to see the command-line options. Terminal mode enables both tools by default and reads the model from `OPENAI_MODEL`.
@@ -412,6 +415,6 @@ Use `python main.py --help` to see the command-line options. Terminal mode enabl
 - **Research uses external services.** Questions, recent context, and tool results are sent to OpenAI. Search queries go to DDGS search providers. The calculator and PDF generation run locally.
 - **API calls can incur charges.** Longer conversations and Deep research can require more model calls. This project does not calculate or display usage costs.
 - **The app is intended for local personal use.** It has no login system or access controls for a public deployment.
-- **Exports use basic formatting.** The PDF is a readable report with orange accents on white pages, rather than a copy of the black browser interface.
+- **Exports use basic formatting.** The PDF uses a standalone report layout with clickable source links.
 
 

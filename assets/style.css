@@ -1,9 +1,13 @@
 :root {
-    --ink: #f5f5f5;
-    --muted: #a6a6a6;
-    --accent: #ff8a32;
-    --line: #2b2b2b;
-    --background: #000000;
+    --ink: #000000;
+    --muted: #000000;
+    --accent: #015a67;
+    --accent-fill: #015a67;
+    --accent-hover: #026f7f;
+    --accent-soft: #edf5f6;
+    --accent-line: #bfd6d9;
+    --line: #e5e7eb;
+    --background: #ffffff;
 }
 
 html,
@@ -33,7 +37,7 @@ body,
 }
 
 [data-testid="stSidebar"] {
-    background: #111111;
+    background: var(--background);
     border-right: 1px solid var(--line);
     min-width: 270px;
     max-width: 270px;
@@ -50,9 +54,9 @@ body,
 .brand {
     display: flex;
     align-items: center;
-    font-size: 40px;
+    font-size: 32px;
     font-weight: 650;
-    letter-spacing: -2.3px;
+    letter-spacing: -1.4px;
     line-height: 1.1;
     margin: 0.75rem 0 0;
 }
@@ -83,9 +87,9 @@ button {
     border-radius: 8px;
     box-shadow: none;
     font-weight: 550;
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #080808;
+    background: var(--accent-fill);
+    border-color: var(--accent-fill);
+    color: var(--ink);
 }
 
 [data-testid="stBaseButton-primary"] p {
@@ -93,9 +97,9 @@ button {
 }
 
 [data-testid="stBaseButton-primary"]:hover {
-    background: #ffa253;
-    border-color: #ffa253;
-    color: #080808;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--ink);
 }
 
 [data-testid="stSidebar"] [data-testid="stBaseButton-primary"] {
@@ -117,27 +121,27 @@ button {
 .empty-history {
     font-size: 12px;
     line-height: 1.8;
-    color: #929292;
+    color: var(--muted);
     padding: 0 2px 35px;
 }
 
 [data-testid="stSidebar"] [data-testid="stExpander"] {
     border-color: var(--line);
     margin-top: 16px;
-    background: #181818;
+    background: var(--background);
     border-radius: 8px;
 }
 
 .sidebar-note {
-    border: 1px solid #57351b;
+    border: 1px solid var(--accent-line);
     border-radius: 10px;
     padding: 17px 16px;
     margin-top: 52px;
-    background: #1c120a;
+    background: var(--accent-soft);
 }
 
 .sidebar-note > span {
-    color: #ff8a32;
+    color: var(--accent);
     font-size: 26px;
     display: block;
     margin-bottom: 8px;
@@ -151,35 +155,35 @@ button {
 
 .sidebar-note p {
     font-size: 12px;
-    color: #b1a69d;
+    color: var(--muted);
     margin: 8px 0 0;
     line-height: 1.7;
 }
 
 [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
     font-size: 8px;
-    color: #969696;
+    color: var(--muted);
     letter-spacing: 0.8px;
 }
 
 .workspace-title {
     font-size: 12px;
-    color: #a6a6a6;
+    color: var(--muted);
 }
 
 .workspace-title span {
     margin: 0 10px;
-    color: #626262;
+    color: var(--muted);
 }
 
 .workspace-title strong {
     font-weight: 500;
-    color: #f5f5f5;
+    color: var(--ink);
 }
 
 .workspace-status {
     font-size: 11px;
-    color: #ff8a32;
+    color: var(--accent);
     text-align: right;
     display: flex;
     align-items: center;
@@ -190,9 +194,9 @@ button {
 .status-dot {
     width: 6px;
     height: 6px;
-    background: #ff8a32;
+    background: var(--accent);
     border-radius: 50%;
-    box-shadow: 0 0 0 3px #ff8a3224;
+    box-shadow: 0 0 0 3px #015a6724;
 }
 
 [data-testid="stMain"] hr {
@@ -208,7 +212,7 @@ button {
 .welcome-kicker {
     font-size: 9px;
     letter-spacing: 1.7px;
-    color: #ff8a32;
+    color: var(--accent);
     display: flex;
     gap: 8px;
     align-items: center;
@@ -221,7 +225,7 @@ button {
 
 .welcome h1 {
     font-family: Georgia, "Times New Roman", serif;
-    color: #f5f5f5;
+    color: var(--ink);
     font-size: clamp(42px, 5vw, 64px);
     font-weight: 400;
     line-height: 1.12;
@@ -231,21 +235,21 @@ button {
 }
 
 .welcome h1 span {
-    color: #ff8a32;
+    color: var(--accent);
 }
 
 .welcome p {
-    color: #a6a6a6;
+    color: var(--muted);
     font-size: 13px;
     line-height: 1.85;
     margin: 21px 0 3px;
 }
 
 .st-key-question_box {
-    background: #161616;
+    background: var(--background);
     border-radius: 13px !important;
-    border-color: #3b2a1e !important;
-    box-shadow: 0 5px 25px #00000040;
+    border-color: var(--line) !important;
+    box-shadow: 0 5px 25px #0000000a;
     padding: 10px 18px 17px !important;
 }
 
@@ -254,7 +258,7 @@ button {
 }
 
 .st-key-question_box [data-testid="stTextArea"] textarea {
-    background: #161616;
+    background: var(--background);
     padding: 17px 0 0;
     font-size: 14px;
     color: var(--ink);
@@ -262,12 +266,12 @@ button {
 
 .st-key-question_box [data-testid="stTextArea"] [data-baseweb="textarea"] {
     border: none;
-    background: #161616;
+    background: var(--background);
     box-shadow: none;
 }
 
 .st-key-question_box [data-testid="stTextArea"] textarea::placeholder {
-    color: #929292;
+    color: var(--muted);
 }
 
 .st-key-question_box [data-testid="stBaseButton-primary"] {
@@ -286,7 +290,7 @@ button {
 
 .composer-hint {
     font-size: 10px;
-    color: #a6a6a6;
+    color: var(--muted);
     text-align: center;
     margin: 0 0 21px;
 }
@@ -301,9 +305,9 @@ button {
 }
 
 .example-icon {
-    color: #ff8a32;
-    background: #24170d;
-    border: 1px solid #57351b;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
     border-radius: 8px;
     width: 31px;
     height: 31px;
@@ -316,22 +320,22 @@ button {
 
 .example-category {
     font-size: 10px;
-    color: #ff8a32;
+    color: var(--accent);
     margin-bottom: 0;
 }
 
 [data-testid="stMain"] [data-testid="stBaseButton-secondary"] {
-    border-color: #2b2b2b;
-    background: #161616;
+    border-color: var(--line);
+    background: var(--background);
 }
 
 [data-testid="stMain"] [data-testid="stBaseButton-secondary"]:hover {
-    border-color: #ff8a32;
-    background: #20160e;
+    border-color: var(--accent);
+    background: var(--accent-soft);
 }
 
 [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"]:has(.example-icon) {
-    background: #141414;
+    background: var(--background);
 }
 
 [data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"]:has(.example-icon) button {
@@ -364,7 +368,7 @@ button {
 }
 
 .workflow-strip span {
-    color: #ff8a32;
+    color: var(--accent);
     font-family: Georgia, serif;
     font-size: 12px;
     grid-row: span 2;
@@ -372,18 +376,18 @@ button {
 }
 
 .workflow-strip strong {
-    color: #f5f5f5;
+    color: var(--ink);
     font-size: 11px;
     font-weight: 500;
 }
 
 .workflow-strip small {
     font-size: 9px;
-    color: #a6a6a6;
+    color: var(--muted);
 }
 
 [data-testid="stChatMessage"] {
-    background: #161616;
+    background: var(--background);
     border: 1px solid var(--line);
     border-radius: 12px;
     margin-top: 12px;
@@ -393,7 +397,7 @@ button {
 .answer-label {
     font-size: 9px;
     letter-spacing: 1.6px;
-    color: #ff8a32;
+    color: var(--accent);
     margin-bottom: 12px;
 }
 
@@ -401,11 +405,11 @@ button {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    border: 1px solid #3b2a1e;
+    border: 1px solid var(--line);
     border-radius: 9px;
     padding: 16px;
     margin: 7px 0 12px;
-    background: #141414;
+    background: var(--background);
     text-decoration: none !important;
     color: var(--ink) !important;
     min-height: 165px;
@@ -415,12 +419,12 @@ button {
 }
 
 .source-card:hover {
-    border-color: #ff8a32;
-    background: #20160e;
+    border-color: var(--accent);
+    background: var(--accent-soft);
 }
 
 .source-domain {
-    color: #ff8a32;
+    color: var(--accent);
     font-size: 10px;
     display: flex;
     justify-content: space-between;
@@ -440,7 +444,7 @@ button {
 
 .source-snippet {
     font-size: 10px;
-    color: #a6a6a6;
+    color: var(--muted);
     line-height: 1.7;
 }
 
@@ -455,7 +459,7 @@ h3 {
 }
 
 [data-testid="stChatInput"] {
-    border-color: #3b2a1e;
+    border-color: var(--line);
     border-radius: 12px;
 }
 

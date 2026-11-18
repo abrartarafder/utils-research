@@ -1,4 +1,4 @@
-"""Atlas — a Streamlit research workspace."""
+"""Utility Lens — a Canadian electricity utilities research workspace."""
 
 import html
 import os
@@ -12,7 +12,7 @@ from research import ResearchSettings, export_pdf, friendly_error, run_research
 
 ROOT = Path(__file__).parent
 load_dotenv(ROOT / ".env")
-st.set_page_config(page_title="Atlas · Research workspace", page_icon="✳", layout="wide",
+st.set_page_config(page_title="Utility Lens · Canadian Utilities Research", page_icon="✳", layout="wide",
                    initial_sidebar_state="expanded")
 st.markdown(f"<style>{(ROOT / 'assets/style.css').read_text()}</style>", unsafe_allow_html=True)
 
@@ -80,7 +80,7 @@ def show_assistant(message: dict, index: int, is_latest: bool):
     payload = message["payload"]
     result = payload.get("result", {})
     with st.chat_message("assistant", avatar="✳"):
-        markup('<div class="answer-label">ATLAS RESEARCH BRIEF</div>')
+        markup('<div class="answer-label">UTILITY LENS UTILITIES RESEARCH BRIEF</div>')
         st.markdown(f"### {result.get('topic', 'Research brief')}")
         st.markdown(message["content"])
         findings = result.get("key_findings", [])
@@ -107,14 +107,14 @@ def show_assistant(message: dict, index: int, is_latest: bool):
 
 def show_landing():
     markup('''<section class="welcome">
-        <div class="welcome-kicker"><span class="tiny-star">✳</span> A LITTLE CURIOSITY GOES A LONG WAY</div>
-        <h1>Good questions.<br><span>Clearer answers.</span></h1>
-        <p>Your research partner for the rabbit holes worth exploring.<br>
-        Search the web, connect the dots, and turn curiosity into clarity.</p>
+        <div class="welcome-kicker"><span class="tiny-star">✳</span> CANADIAN ELECTRICITY UTILITIES</div>
+        <h1>Utilities research.<br><span>A Canadian perspective.</span></h1>
+        <p>Explore Hydro One and Canada's electricity sector.<br>
+        Understand grid investment, reliability, and regulation with linked sources.</p>
     </section>''')
     with st.container(border=True, key="question_box"):
-        st.text_area("What are you curious about?", key="composer", height=115,
-                     placeholder="Ask a question, explore a topic, or compare a few ideas…",
+        st.text_area("What would you like to research about Canadian utilities?", key="composer", height=115,
+                     placeholder="Ask about Hydro One, grid reliability, or electricity regulation…",
                      label_visibility="collapsed", max_chars=6000)
         controls, action = st.columns([3, 1.35], vertical_alignment="center")
         with controls:
@@ -124,12 +124,21 @@ def show_landing():
             if st.button("Begin research  →", type="primary", use_container_width=True,
                          disabled=not st.session_state.composer.strip()):
                 st.session_state.pending_prompt = st.session_state.composer
-    markup('<div class="composer-hint">A focused brief or a deeper dive. You choose the pace.</div>')
+    markup('<div class="composer-hint">Public sources. Canadian context. A quick brief or a deeper dive.</div>')
     markup('<div class="eyebrow inspiration-label">NEED A STARTING POINT?</div>')
     examples = [
-        ("⌘", "Technology", "What's next for AI agents?", "Research current trends in AI agents, their practical uses, and their limitations."),
-        ("↗", "Business", "Find the signal in the market", "Compare the business models of subscription software and usage-based software, including their trade-offs."),
-        ("◎", "Science", "Follow the energy transition", "Compare solar and wind energy: costs, reliability, and recent technological progress."),
+        ("↗", "Hydro One", "Explore grid investment",
+         "Research Hydro One's latest publicly reported transmission and distribution investment priorities in Ontario. "
+         "Explain timelines, reported costs, and intended reliability benefits using public utility reports and regulatory "
+         "filings. State the reporting period and distinguish proposed plans from approved investments."),
+        ("◎", "Reliability", "Compare utility reliability",
+         "Compare Hydro One's distribution reliability with another Canadian electricity utility using the latest comparable "
+         "published SAIDI and SAIFI data. Define the metrics, align reporting years and major-event exclusions, and explain "
+         "any limits on the comparison. Identify missing data rather than estimating it."),
+        ("≋", "Regulation", "Understand Ontario's grid",
+         "Explain the distinct roles of Hydro One, the Ontario Energy Board (OEB), and the Independent Electricity System "
+         "Operator (IESO) in Ontario's electricity sector. Use official sources and distinguish transmission, distribution, "
+         "regulation, and system operation."),
     ]
     for column, (icon, category, title, question) in zip(st.columns(3, gap="medium"), examples):
         with column:
@@ -138,9 +147,9 @@ def show_landing():
                 st.button(f"{title}  ↗", key=f"example_{category}", use_container_width=True,
                           on_click=set_example, args=(question,))
     markup('''<div class="workflow-strip">
-        <div><span>01</span><strong>Ask a question</strong><small>Give your curiosity a direction</small></div>
-        <div><span>02</span><strong>Explore the evidence</strong><small>Web sources and accurate calculations</small></div>
-        <div><span>03</span><strong>Bring it together</strong><small>Useful findings, with context</small></div>
+        <div><span>01</span><strong>Choose a utility topic</strong><small>Grid investment, reliability, or regulation</small></div>
+        <div><span>02</span><strong>Explore public sources</strong><small>Utility reports and sector publications</small></div>
+        <div><span>03</span><strong>Understand the findings</strong><small>Canadian context and linked evidence</small></div>
     </div>''')
 
 
@@ -148,15 +157,15 @@ initialize()
 messages = st.session_state.messages
 
 with st.sidebar:
-    markup('<div class="brand"><span class="brand-symbol">✳</span> atlas<span class="brand-dot">.</span></div>'
-           '<div class="brand-caption">A workspace for curious minds</div>')
+    markup('<div class="brand"><span class="brand-symbol">✳</span> utility lens<span class="brand-dot">.</span></div>'
+           '<div class="brand-caption">Canadian electricity utilities research</div>')
     st.button("＋  New research", key="new_research", type="primary", use_container_width=True, on_click=new_research)
     st.divider()
     markup('<div class="eyebrow recent-label">THIS CONVERSATION</div>')
     if messages:
         st.caption(f"{len(messages) // 2} questions explored")
     else:
-        markup('<div class="empty-history">A fresh page.<br>Your next discovery starts here.</div>')
+        markup('<div class="empty-history">A fresh brief.<br>Start with a utility or a grid question.</div>')
     st.caption("Ask follow-ups to keep exploring the same topic.")
     with st.expander("Settings", icon=":material/tune:"):
         st.text_input("OpenAI API key", type="password", key="api_key_input",
@@ -165,14 +174,14 @@ with st.sidebar:
         st.toggle("Web search", key="web_search")
         st.toggle("Calculator", key="calculator")
         st.caption("Memory lasts for this browser session. Refreshing the page or starting new research clears it.")
-    markup('<div class="sidebar-note"><span>✳</span><strong>Stay curious.</strong>'
-           '<p>From the first question<br>to your next perspective.</p></div>')
-    st.caption("ATLAS / YOUR RESEARCH COMPANION")
+    markup('<div class="sidebar-note"><span>✳</span><strong>Follow the grid.</strong>'
+           '<p>From public utility reports<br>to a clearer understanding.</p></div>')
+    st.caption("UTILITY LENS / CANADIAN UTILITIES RESEARCH")
 
 api_key = st.session_state.api_key_input.strip() or os.getenv("OPENAI_API_KEY", "")
 top_left, top_right = st.columns([3, 2], vertical_alignment="center")
 with top_left:
-    markup('<div class="workspace-title">Workspace <span>/</span> <strong>Research</strong></div>')
+    markup('<div class="workspace-title">Workspace <span>/</span> <strong>Canadian utilities</strong></div>')
 with top_right:
     markup('<div class="workspace-status"><span class="status-dot"></span>'
            f'{"Ready to explore" if api_key else "Add an API key in Settings"}</div>')
@@ -186,11 +195,11 @@ else:
     heading, download = st.columns([3, 1], vertical_alignment="center")
     with heading:
         markup('<div class="eyebrow">THE EXPLORATION CONTINUES</div>')
-        st.markdown("## Your research")
+        st.markdown("## Your utilities research")
     with download:
         title = messages[0]["content"][:80]
         st.download_button("Download PDF", export_pdf(messages, title),
-                           file_name="atlas-research.pdf", mime="application/pdf", use_container_width=True)
+                           file_name="utility-lens-research.pdf", mime="application/pdf", use_container_width=True)
     for index, message in enumerate(messages):
         if message["role"] == "user":
             with st.chat_message("user", avatar=":material/person:"):
@@ -198,7 +207,7 @@ else:
         else:
             show_assistant(message, index, is_latest=index == len(messages) - 1)
     st.segmented_control("Research depth", ["Quick brief", "Deep research"], key="depth")
-    prompt = st.chat_input("Ask a follow-up. Atlas remembers the conversation.", max_chars=6000)
+    prompt = st.chat_input("Ask a follow-up. Utility Lens remembers the conversation.", max_chars=6000)
     if prompt:
         st.session_state.pending_prompt = prompt
 

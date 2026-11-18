@@ -11,8 +11,8 @@ from research import ResearchSettings, export_markdown, friendly_error, run_rese
 
 def main():
     load_dotenv(Path(__file__).with_name(".env"))
-    parser = argparse.ArgumentParser(description="Atlas research assistant")
-    parser.add_argument("topic", nargs="?", help="Research one topic, then exit")
+    parser = argparse.ArgumentParser(description="Utility Lens Canadian electricity utilities research assistant")
+    parser.add_argument("topic", nargs="?", help="Research one utilities topic, then exit")
     parser.add_argument("--deep", action="store_true", help="Investigate more angles and sources")
     args = parser.parse_args()
     key = os.getenv("OPENAI_API_KEY", "")
@@ -23,7 +23,7 @@ def main():
                                 depth="Deep research" if args.deep else "Quick brief")
     while True:
         try:
-            question = args.topic or input("\nResearch question (or 'quit'): ").strip()
+            question = args.topic or input("\nUtilities research question (or 'quit'): ").strip()
             if question.lower() in {"quit", "exit"}:
                 break
             if not question:
