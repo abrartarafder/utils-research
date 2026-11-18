@@ -126,13 +126,13 @@ When you return to the project later, activate the existing virtual environment 
 
 ## Using the interface
 
-1. Open **Settings** in the sidebar and check the model and tool toggles.
-2. Enter a question on the welcome screen, or click an example to fill the question box.
-3. Choose **Quick brief** or **Deep research**, then click **Begin research**.
+1. Open **Settings** in the header to configure your API key, model, and tools. Choose **Quick brief** or **Deep research**.
+2. Type a question in the chat. To start with a draft, select a research topic or choose a city on the Ontario map and click **Use location in chat**.
+3. Review the question and send it from the chat box.
 4. Read the brief and **Key takeaways**. Open **Sources** to visit the linked pages and **Research activity** to inspect tool results.
 5. Type a follow-up in the chat box, or click a suggested follow-up question.
 6. Click **Download PDF** to save the current conversation as `utility-lens-research.pdf`.
-7. Click **New research** when you want to clear the conversation and start another topic.
+7. Click **New research** in **Settings** when you want to clear the conversation and start another topic.
 
 ![A Utility Lens research brief showing an answer and key takeaways with source links](assets/img/result.png)
 
@@ -196,6 +196,7 @@ AI-agent-/
 │   └── config.toml           # Streamlit theme and runtime settings
 └── assets/
     ├── style.css             # Custom interface styles
+    ├── ontario-map.webp      # Ontario basemap rendered from Natural Earth data
     └── img/                  # Screenshots used in this README
         ├── landing.png
         ├── result.png
@@ -210,21 +211,20 @@ Your local folder may also contain `.env`, `venv/`, `__pycache__/`, and `.git/`.
 
 ### `app.py` — the Streamlit interface
 
-This is the entry point for the browser app. It loads `.env`, sets the page title and layout, reads `assets/style.css`, and builds the sidebar, welcome screen, conversation view, and download button.
+This is the entry point for the browser app. It loads `.env`, reads `assets/style.css`, and builds the research dashboard with chat, an Ontario location picker, and links to official sources.
 
 The main helpers are:
 
 | Function | Responsibility |
 | --- | --- |
-| `markup()` | Renders the small HTML fragments used for branding and layout. |
 | `initialize()` | Creates default session values without overwriting values already in the current session. |
 | `new_research()` | Clears messages, the current question, and failed-request state. |
-| `set_example()` | Copies a sample question into the question box. |
+| `set_example()` | Copies a suggested question into the chat input. |
 | `queue_question()` | Marks a suggested follow-up as the next question to run. |
 | `activity_label()` / `show_activity()` | Turn tool results into readable activity messages. |
 | `source_cards()` | Displays source links in two columns, escapes source text, normalizes whitespace, and shortens previews. |
 | `show_assistant()` | Displays a brief, findings, source and activity tabs, and follow-up buttons. |
-| `show_landing()` | Builds the welcome screen, question box, depth selector, and examples. |
+| `show_intro()` / `show_ontario()` | Display research topic shortcuts and the Ontario map with its location picker and source links. |
 
 Streamlit reruns the script when you interact with many widgets. `st.session_state` keeps values between those reruns. `pending_prompt` records a question ready to run; the script consumes it, calls `run_research()`, saves the result, and reruns to show the updated conversation. Failed requests keep their question so the **Retry research** button can try again.
 
