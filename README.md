@@ -1,420 +1,92 @@
-# Utility Lens · Canadian Utilities Research
+# Utility Lens
 
-Utility Lens is a personal research assistant for Canadian electricity utilities, built with Python, Streamlit, LangChain, and OpenAI. Explore Hydro One and the wider Canadian electricity sector: grid investment, transmission and distribution, reliability, asset management, and regulation. Ask a question, let the agent search public web sources or calculate numbers, and receive a research brief with linked sources. You can ask follow-up questions and download the conversation as a PDF.
+**A research assistant for Ontario’s electricity grid and Canadian utilities.**
 
-The research instructions prioritise public utility reports, regulatory filings, and the relevant provincial regulator and system operator. Ontario examples include [Hydro One](https://www.hydroone.com/about), the [Ontario Energy Board](https://www.oeb.ca/about-oeb/what-we-do), and the [IESO](https://www.ieso.ca/). Questions about other provinces use their own jurisdiction as context. Briefs are instructed to state reporting periods and units, distinguish proposals from approvals, and explain limits when comparing reliability metrics.
+Utility plans, reliability reports, and regulatory decisions are published across different sites. Utility Lens helps you find the relevant sources, ask follow-up questions, and turn your research into a PDF brief with clickable citations.
 
-The project is small enough to understand file by file while demonstrating practical skills for a portfolio: tool calling, conversation memory, structured AI responses, a custom interface, and document export. It runs locally and keeps conversations in memory, with no database or account system to configure.
+[Interface](#interface) · [Demo walkthrough](#demo-walkthrough) · [Run locally](#run-locally) · [Architecture](#architecture)
 
-![Utility Lens welcome screen with a question box and research depth options](assets/img/landing.png)
+## Interface
 
-*Earlier interface shown for illustration. The current workspace uses Canadian utilities examples, teal accents (#015a67), white backgrounds, and black text.*
+![Utility Lens dashboard with topic shortcuts, a chat conversation, PDF export, and a map of Ontario](assets/screenshots/research-dashboard.png)
 
-## Contents
+**Research dashboard.** Start with a grid investment, reliability, grid roles, or regulation shortcut, or write your own question. The dashboard keeps the conversation, Ontario map, and research references in view.
 
-- [What the agent can do](#what-the-agent-can-do)
-- [Setup and first run](#setup-and-first-run)
-- [Using the interface](#using-the-interface)
-- [How a research request works](#how-a-research-request-works)
-- [Project structure](#project-structure)
-- [Every file explained](#every-file-explained)
-- [Conversation memory and result format](#conversation-memory-and-result-format)
-- [Using the terminal interface](#using-the-terminal-interface)
-- [Limitations and data handling](#limitations-and-data-handling)
+### Research an Ontario city
 
-## What the agent can do
+<img src="assets/screenshots/ontario-city-picker.png" width="360" alt="Ontario map highlighting Toronto, with the Research near selector and Use location in chat button">
 
-| Feature | What it means |
-| --- | --- |
-| Canadian electricity focus | Research Hydro One and other Canadian electricity utilities, with attention to province, reporting period, and source quality. |
-| Web search | The agent can find titles, preview snippets, and URLs through DDGS. A separate search API key is not required. |
-| Calculator | The agent can use a Python arithmetic tool for numerical work. |
-| Multi-step research | The agent can use a tool, read the result, refine its approach, and use another tool before answering. |
-| Research depth | Choose a concise **Quick brief** or a more detailed **Deep research** request. |
-| Conversation memory | Ask follow-ups using the recent conversation as context. |
-| Structured results | Each answer has a title, summary, key findings, sources, and suggested follow-up questions. |
-| Visible activity | See the searches and calculations that actually ran. |
-| PDF download | Save the conversation, findings, and clickable source links. |
-| Custom interface | White backgrounds, teal accents (#015a67), black text, and responsive styling. |
-| Terminal mode | Use the same research workflow without the browser interface. |
+**Ontario city picker.** Choose Toronto, Ottawa, Sudbury, or Thunder Bay. **Use location in chat** drafts a question about the utilities and planned grid investments near that city. You can edit the draft before sending.
 
-An **agent** is an AI model connected to tools. The model decides whether a tool would help; Python executes the requested tool and gives the result back to the model. The workflow can repeat until the agent produces its answer.
+### Open an official source
 
-## Setup and first run
+<img src="assets/screenshots/official-research-sources.png" width="420" alt="Research sources panel with links to Hydro One, the IESO, and the Ontario Energy Board">
 
-### 1. Check the prerequisites
+**Official research sources.** Open Hydro One, the Independent Electricity System Operator (IESO), or the Ontario Energy Board directly from the dashboard. The **Sources** tab in each brief lists the links cited for that answer.
 
-You need:
+## Demo walkthrough
 
-- Python **3.11 or later** recommended for this guide.
-- A terminal and a code editor.
-- An internet connection for OpenAI and web search.
-- An OpenAI API key with available API usage and access to the model you select.
+1. Pick **Sudbury** on the map, click **Use location in chat**, and send the drafted question. Try asking about another Canadian utility directly in chat to research outside Ontario.
+2. Read the brief and **Key takeaways**. Open **Sources** to check the citations and **Research activity** to see the searches and calculations the agent ran.
+3. Ask a follow-up such as “Which of these projects have regulatory approval, and when are they expected to enter service?” The agent uses recent turns and their recorded sources for context.
+4. Click **Download PDF** to save the conversation, findings, and source links. To start a fresh conversation, select **Settings → New research**.
 
-Download or clone the repository, then open a terminal in its project folder. Run all commands below from that folder, where `app.py` and `requirements.txt` are located.
+In **Settings**, choose **Quick brief** for a focused first pass or **Deep research** for a more detailed investigation with a larger step budget. You can also change the model or toggle web search and the calculator.
 
-Check your Python version:
+## Run locally
+
+You’ll need **Python 3.11 or later**, an internet connection, and an OpenAI API key to run research.
 
 ```bash
-python3 --version
-```
-
-On Windows, you can use `py -3 --version` instead.
-
-### 2. Create and activate a virtual environment
-
-A **virtual environment** is a folder containing this project's Python packages. It keeps them separate from packages used by your other projects.
-
-On macOS or Linux:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-On Windows PowerShell:
-
-```powershell
-py -3 -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-The `venv` folder is generated locally. It does not need to be committed to Git.
-
-### 3. Install the dependencies
-
-With the virtual environment active:
-
-```bash
+git clone https://github.com/abrartarafder/utils-research.git
+cd utils-research
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install -r requirements.txt
-```
-
-This installs the libraries listed in `requirements.txt`, including Streamlit for the interface and ReportLab for PDF generation.
-
-### 4. Configure your API key
-
-If you do not already have a `.env` file, copy `.env.example` and name the copy `.env`. Keep an existing `.env` file if you have already configured the project.
-
-For a fresh setup on macOS or Linux:
-
-```bash
-cp -n .env.example .env
-```
-
-You can also create the copy through your code editor or file manager on any platform. Edit it to contain:
-
-```dotenv
-OPENAI_API_KEY=replace-with-your-api-key
-OPENAI_MODEL=gpt-4o
-```
-
-`OPENAI_MODEL` sets the starting model name. The app defaults to `gpt-4o` when this variable is absent. Choose a model available to your API account that supports the agent's tool calling.
-
-In the browser app, you can enter a key under **Settings → OpenAI API key** instead. A key entered there takes priority over the environment key and is kept in the current Streamlit session. Terminal mode needs the key in `.env` or your shell environment.
-
-Keep your real key out of `.env.example`, screenshots, and Git commits. `.gitignore` excludes `.env` from normal Git tracking.
-
-### 5. Start the browser app
-
-```bash
 python -m streamlit run app.py
 ```
 
-Open the local URL printed in the terminal, usually `http://localhost:8501`. Keep the terminal running while you use the app. Press `Ctrl+C` in that terminal to stop the server.
+On Windows PowerShell, create and activate the environment with `py -3 -m venv .venv` and `.\.venv\Scripts\Activate.ps1`. Then run the same install and launch commands.
 
-When you return to the project later, activate the existing virtual environment and run the same Streamlit command. You only need to install dependencies again when they change or when setting up a new environment.
+Open the URL printed in the terminal, usually [http://localhost:8501](http://localhost:8501). Enter your key under **Settings → OpenAI API key**, or copy [.env.example](.env.example) to a local `.env` file and set `OPENAI_API_KEY` there. `OPENAI_MODEL` controls the default model and falls back to `gpt-4o`. A key entered in Settings takes priority for that session.
 
-## Using the interface
+### Terminal mode
 
-1. Open **Settings** in the header to configure your API key, model, and tools. Choose **Quick brief** or **Deep research**.
-2. Type a question in the chat. To start with a draft, select a research topic or choose a city on the Ontario map and click **Use location in chat**.
-3. Review the question and send it from the chat box.
-4. Read the brief and **Key takeaways**. Open **Sources** to visit the linked pages and **Research activity** to inspect tool results.
-5. Type a follow-up in the chat box, or click a suggested follow-up question.
-6. Click **Download PDF** to save the current conversation as `utility-lens-research.pdf`.
-7. Click **New research** in **Settings** when you want to clear the conversation and start another topic.
-
-![A Utility Lens research brief showing an answer and key takeaways with source links](assets/img/result.png)
-
-*A completed brief brings the answer, key takeaways, and source links into one view.*
-
-Try this first:
-
-> Explain the roles of Hydro One, the Ontario Energy Board, and the IESO in Ontario's electricity sector. Distinguish transmission, distribution, regulation, and system operation, and link official sources.
-
-Then ask:
-
-> What do Hydro One's latest public reports say about grid investment priorities? Distinguish proposed plans from approved projects and state the reporting period.
-
-**Quick brief** asks for a focused answer. **Deep research** asks the model to explore more angles and cross-check claims, and allows a larger workflow step limit. The exact searches and calculations depend on the model's decisions; neither mode promises a fixed number of tool calls.
-
-The tool toggles control what is available to the agent. Turning off web search removes its ability to check current information through this project's search tool. Turning off the calculator removes the arithmetic tool. Changing the depth or settings affects the next request.
-
-## How a research request works
-
-Both interfaces call the same Python workflow:
-
-```mermaid
-flowchart TD
-    Browser[app.py: browser interface] --> Workflow[research.py: research workflow]
-    Terminal[main.py: terminal interface] --> Workflow
-    Workflow --> Agent[LangChain agent using OpenAI]
-    Agent --> Tools[tools.py: search or calculator]
-    Tools --> Agent
-    Agent --> Result[Structured brief and source checks]
-    Result --> Browser
-    Result --> Terminal
-    Browser --> PDF[research.py: PDF generation]
-```
-
-Here is the sequence in plain language:
-
-1. The interface collects your question and settings.
-2. `run_research()` checks the question, API key, and model name.
-3. It includes up to the latest **24 messages**, usually 12 question-and-answer pairs, plus the sources recorded for earlier answers.
-4. `build_agent()` creates the OpenAI model connection and makes the enabled tools available through LangChain.
-5. The agent can request searches or calculations. Their results return to the agent, and completed tool activity is shown in the interface.
-6. The agent produces a response matching the `ResearchResult` schema.
-7. The workflow checks source URLs against URLs seen in searches or recent conversation history, and builds the final result dictionary.
-8. The interface stores the question and answer in memory, displays the brief, and makes it available for follow-ups and export.
-
-For example, a price-comparison question might lead to a search for prices, a calculation of the percentage difference, and a final comparison with source links. This is one agent using tools in several steps; there are no separate specialist agents in the project.
-
-## Project structure
-
-```text
-AI-agent-/
-├── app.py                    # Browser interface
-├── research.py               # Shared agent workflow and report export
-├── tools.py                  # Search and calculator implementations
-├── main.py                   # Optional terminal interface
-├── requirements.txt          # Python dependencies
-├── README.md                 # This guide
-├── .env.example              # Safe configuration template
-├── .gitignore                # Files Git should leave out
-├── .streamlit/
-│   └── config.toml           # Streamlit theme and runtime settings
-└── assets/
-    ├── style.css             # Custom interface styles
-    ├── ontario-map.webp      # Ontario basemap rendered from Natural Earth data
-    └── img/                  # Screenshots used in this README
-        ├── landing.png
-        ├── result.png
-        ├── followup.png
-        ├── followup2.png
-        └── pdf_sample.png
-```
-
-Your local folder may also contain `.env`, `venv/`, `__pycache__/`, and `.git/`. These contain your local configuration, installed packages, generated Python cache files, and Git history respectively. They are not additional application modules. Files and folders starting with a dot may be hidden by your file manager.
-
-## Every file explained
-
-### `app.py` — the Streamlit interface
-
-This is the entry point for the browser app. It loads `.env`, reads `assets/style.css`, and builds the research dashboard with chat, an Ontario location picker, and links to official sources.
-
-The main helpers are:
-
-| Function | Responsibility |
-| --- | --- |
-| `initialize()` | Creates default session values without overwriting values already in the current session. |
-| `new_research()` | Clears messages, the current question, and failed-request state. |
-| `set_example()` | Copies a suggested question into the chat input. |
-| `queue_question()` | Marks a suggested follow-up as the next question to run. |
-| `activity_label()` / `show_activity()` | Turn tool results into readable activity messages. |
-| `source_cards()` | Displays source links in two columns, escapes source text, normalizes whitespace, and shortens previews. |
-| `show_assistant()` | Displays a brief, findings, source and activity tabs, and follow-up buttons. |
-| `show_intro()` / `show_ontario()` | Display research topic shortcuts and the Ontario map with its location picker and source links. |
-
-Streamlit reruns the script when you interact with many widgets. `st.session_state` keeps values between those reruns. `pending_prompt` records a question ready to run; the script consumes it, calls `run_research()`, saves the result, and reruns to show the updated conversation. Failed requests keep their question so the **Retry research** button can try again.
-
-![Source preview cards and suggested follow-up questions in the Utility Lens conversation view](assets/img/followup.png)
-
-*Source cards let you inspect the evidence; suggested questions give you a starting point for the next request.*
-
-The download button calls `export_pdf()` with the whole current message list. PDF bytes are generated in memory and offered to the browser; the app does not write reports into the project folder.
-
-### `research.py` — the shared research engine
-
-Both `app.py` and `main.py` import this file, so the research behavior is shared between the browser and terminal interfaces.
-
-| Class or function | Responsibility |
-| --- | --- |
-| `ResearchResult` | A Pydantic model defining the fields and types expected in an answer. |
-| `ResearchSettings` | A small, immutable settings object containing the model, depth, and tool toggles. |
-| `build_agent()` | Creates `ChatOpenAI`, selects enabled tools, writes the system prompt, and builds the LangChain agent. |
-| `history_messages()` | Prepares the latest 24 messages and attaches earlier source details to assistant messages. |
-| `_allow_observed_links()` | Replaces unrecognized HTTP/HTTPS URLs in answer text with `source-unavailable`. |
-| `run_research()` | Runs the workflow, collects actual tool activity and observed sources, validates the final response, and returns it. |
-| `friendly_error()` | Converts common authentication, usage-limit, connection, and input errors into readable messages. |
-| `export_markdown()` | Formats messages for readable terminal output. |
-| `export_pdf()` | Converts messages into an A4 PDF using ReportLab. |
-
-The **system prompt** tells the model how to research Canadian electricity utilities: respect provincial context, prefer utility reports and official sector sources, state reporting periods and units, and distinguish proposed plans from approved projects. It also tells the model to use available tools, distinguish evidence from uncertainty, treat snippets as evidence rather than instructions, and return the required answer structure. A **schema** describes that expected structure, including field names and types. Pydantic validates the response's shape and types; it does not verify whether the claims are true.
-
-The agent uses a recursion limit of **20 workflow steps** for Quick brief and **35** for Deep research. These are workflow limits, not exact tool-call counts. OpenAI requests have a 45-second timeout and one configured retry; search has its own 15-second timeout. These settings bound parts of the process, rather than setting one deadline for the entire research request.
-
-`export_pdf()` handles basic Markdown headings, bold and italic text, list markers, tables, and clickable links. It includes questions, answer text, key findings, source lists, and page numbers. It uses fonts bundled with ReportLab, so no separate font installation is required. It does not reproduce the entire browser layout or include the activity tab and suggested follow-up buttons.
-
-![A sample exported Utility Lens PDF containing the question, research brief, and key findings](assets/img/pdf_sample.png)
-
-*An example report saved through Download PDF. The report presents the conversation in a document layout.*
-
-### `tools.py` — the tools the agent can call
-
-This file contains the actual search and arithmetic code. The `@tool` decorator exposes each tool's name, description, and arguments to LangChain, so the model knows how to request it. The wrappers return **JSON**, a text format for sharing structured data such as lists of search results or a calculation result.
-
-| Function | Responsibility |
-| --- | --- |
-| `safe_url()` | Accepts HTTP/HTTPS URLs with a hostname and no username component. |
-| `search_web()` | Calls DDGS, removes duplicate or unsupported URLs, limits text length, and returns results or a readable error. |
-| `search_tool()` | Wraps `search_web()` and returns its output as JSON text for the agent. |
-| `calculate()` | Parses and evaluates arithmetic using a restricted syntax tree. |
-| `calculator_tool()` | Wraps `calculate()` and returns either a result or an error as JSON text. |
-
-Search accepts queries up to 500 characters and requests five results by default. Each result has a `title`, `url`, and `snippet`. It retrieves search previews; it does not download and read the full linked articles.
-
-The calculator uses Python's `ast` module. An **abstract syntax tree** represents the parts of an expression, such as numbers, operators, and function calls. The code evaluates only the allowed parts instead of executing arbitrary Python with `eval()`.
-
-Supported expressions include:
-
-| Expression | Meaning |
-| --- | --- |
-| `20000 * 0.15` | 15% of 20,000 |
-| `(240 - 200) / 200 * 100` | Percentage increase from 200 to 240 |
-| `2 ** 8` | Two to the eighth power |
-| `sqrt(144)` | Square root of 144 |
-| `round(pi * 5 ** 2, 2)` | Area of a circle with radius 5, rounded to two decimals |
-
-It supports `+`, `-`, `*`, `/`, `//`, `%`, `**`, parentheses, `pi`, `e`, and the functions `sqrt`, `log`, `log10`, `abs`, `round`, `min`, and `max`. `%` means remainder; write 15 percent as `0.15`. Length, tree size, exponent, and number-size limits help reject overly complex expressions. It uses ordinary Python numbers, so floating-point rounding can still occur.
-
-### `main.py` — the terminal entry point
-
-This is an alternative way to use Utility Lens. It loads `.env`, reads command-line arguments, creates an in-memory history list, and calls the same `run_research()` function used by Streamlit.
-
-With no topic argument, it repeatedly asks for questions until you type `quit` or `exit`. With a topic argument, it researches that topic once and exits. `--deep` selects Deep research. Activity is printed while tools finish, followed by a Markdown-formatted brief.
-
-The browser downloads PDFs; terminal mode prints Markdown. `main.py` does not create a Markdown or PDF file automatically.
-
-### `assets/style.css` — the custom design
-
-This stylesheet controls layout, spacing, typography, buttons, the welcome screen, source cards, chat panels, and responsive adjustments for smaller screens. Each CSS property is written on its own line.
-
-The `:root` block defines shared variables such as `--accent` for teal (#015a67), `--background` for white, and `--ink` and `--muted` for black text. Related variables set teal button fills, hover states, and subtle borders.
-
-Selectors such as `.source-card` style the project's HTML. Selectors using `[data-testid="..."]` style Streamlit components. Media queries adjust the design at different screen widths. `app.py` reads and inserts this file when rendering the page.
-
-### `assets/img/` — README screenshots
-
-These images illustrate the app in this guide. `landing.png` shows the welcome screen, `result.png` shows a research brief, `followup.png` shows sources and suggested questions, `followup2.png` shows a later question in the same conversation, and `pdf_sample.png` shows an exported report. 
-
-### `.streamlit/config.toml` — Streamlit's configuration
-
-This file sets the native Streamlit theme to light, with teal (#015a67) as `primaryColor`, white backgrounds, and black text. This makes native widgets match the custom CSS.
-
-The `[server]` section sets `headless = true`, so Streamlit does not automatically open a browser. The `[browser]` section disables Streamlit usage-statistics collection. These options configure Streamlit; the Python files still handle research requests.
-
-### `requirements.txt` — the dependencies
-
-`pip` reads this file to install the project's third-party libraries.
-
-| Package | Why the project uses it |
-| --- | --- |
-| `langchain` | Builds the agent and coordinates the tool workflow. |
-| `langchain-openai` | Connects the agent to OpenAI through `ChatOpenAI`. |
-| `langchain-core` | Provides common LangChain types, tool decorators, and tool messages. |
-| `ddgs` | Provides web search results. |
-| `python-dotenv` | Loads configuration from `.env`. |
-| `pydantic` | Defines and validates the structured answer schema. |
-| `streamlit` | Provides the browser interface and session state. |
-| `reportlab` | Creates downloadable PDF reports. |
-
-Version expressions such as `>=1.4,<2` allow compatible releases within a range. They do not lock installation to one exact version. Modules such as `ast`, `json`, `math`, and `pathlib` are part of Python and need no separate installation.
-
-### `.env.example` — the configuration template
-
-This file documents the expected environment variables using a placeholder key. It can be shared in Git because it should contain no real credentials. Copy it to `.env` for your own setup.
-
-Both entry points call `load_dotenv()` to load `.env`. An environment variable already set in your shell takes precedence over the value in `.env` because the code uses the default dotenv loading behavior.
-
-### `.gitignore` — local files excluded from Git
-
-This file excludes real environment files, Streamlit secrets, virtual environments, Python caches, and macOS `.DS_Store` files. It explicitly allows `.env.example` to be included.
-
-Git ignore rules prevent untracked matching files from being added normally. They do not remove a file that was already committed.
-
-### `README.md` — the project guide
-
-This is the document you are reading. It explains installation, usage, architecture, and the responsibilities of each file. Update it when you change setup commands or project behavior so someone cloning the repository can follow it without needing your help.
-
-## Conversation memory and result format
-
-The browser stores messages in `st.session_state.messages`. The terminal stores them in a normal Python list. Neither interface writes conversations to a database or a saved history file.
-
-Browser memory survives normal Streamlit reruns within the current session. Refreshing or disconnecting can reset that session; **New research** explicitly clears the conversation. Terminal memory ends when the process exits. Download a PDF before clearing a conversation you want to keep.
-
-All stored messages remain available for display and PDF export while the session lasts. Only the latest 24 messages are sent as conversation context for the next research request, so much older details may no longer influence an answer.
-
-![A continuing Utility Lens conversation with two questions explored, Deep research selected, and a follow-up being typed](assets/img/followup2.png)
-
-*Continue the same conversation with a follow-up, and choose the depth for the next answer.*
-
-`ResearchResult` defines these answer fields:
-
-| Field | Contents |
-| --- | --- |
-| `topic` | A short title. |
-| `summary` | The main brief, formatted as Markdown with source links. |
-| `key_findings` | A list of takeaways. |
-| `sources` | Source URLs retained by the workflow's source checks. |
-| `tools_used` | Tool names derived from recorded activity. |
-| `follow_up_questions` | Suggested next questions. |
-
-`run_research()` wraps that answer in a dictionary:
-
-```python
-{
-    "result": {...},          # The ResearchResult fields above
-    "source_details": [...], # Source titles, URLs, and preview snippets
-    "activity": [...],       # Tool names, outputs, and completion/error status
-    "elapsed": 12.3          # Example duration in seconds
-}
-```
-
-Each successful exchange adds a user message and an assistant message to history. The assistant message's `content` contains the summary, and its `payload` contains the dictionary above. This lets the interface display the answer while retaining the sources and findings for follow-ups and export.
-
-## Using the terminal interface
-
-Activate the virtual environment first, then run:
+With `OPENAI_API_KEY` configured in `.env` or your shell environment, run an interactive session or ask a single question using the same research workflow.
 
 ```bash
 python main.py
+python main.py --deep "What grid investments are planned near Sudbury, Ontario?"
 ```
 
-Type a question at the prompt. Keep asking follow-ups in the same process, and type `quit` or `exit` to finish.
+## Architecture
 
-To research a single topic and exit:
-
-```bash
-python main.py "Explain Hydro One's role in Ontario's electricity grid"
+```mermaid
+flowchart TD
+    UI["Streamlit dashboard"] --> Agent["LangChain agent · OpenAI"]
+    CLI["Terminal interface"] --> Agent
+    Agent <-->|Tool calls and results| Tools["DDGS web search · Python calculator"]
+    Agent --> Brief["Pydantic research brief and source checks"]
+    Brief --> Results["Chat and terminal output"]
+    Brief --> PDF["ReportLab PDF export"]
 ```
 
-To request a deeper brief:
+- **Research.** The agent can refine web searches and use a local arithmetic tool. The research prompt asks it to prioritize primary sources, align reporting periods and units, and distinguish proposed, approved, and in-service projects.
+- **Structured results.** Pydantic validates the response shape. The workflow checks citations against links returned by search or recorded in recent conversation history.
+- **Conversation context.** Each request includes up to 24 recent messages and their recorded sources. The full session remains available for PDF export.
 
-```bash
-python main.py "Research Hydro One's latest public grid investment priorities" --deep
-```
+| File | Responsibility |
+| --- | --- |
+| [`app.py`](app.py) | Streamlit dashboard, map, settings, conversation, and export controls |
+| [`research.py`](research.py) | Agent configuration, research loop, citation filtering, and PDF rendering |
+| [`tools.py`](tools.py) | DDGS search and a calculator for bounded arithmetic |
+| [`main.py`](main.py) | Terminal interface |
+| [`assets/`](assets/) | Styles, Ontario basemap, and screenshots |
 
-Use `python main.py --help` to see the command-line options. Terminal mode enables both tools by default and reads the model from `OPENAI_MODEL`.
+### Data and scope
 
-## Limitations and data handling
+Web search returns titles, URLs, and preview snippets. Citation checks track where a link came from. Open the original document to confirm claims, figures, and dates.
 
-- **Search previews have limited context.** The agent sees snippets, not full articles. Open sources to check important claims.
-- **Source checks are not fact checks.** Keeping URLs tied to observed results helps avoid fabricated links, but does not prove a claim is correct or a source is reliable. `safe_url()` checks URL format, not the destination's trustworthiness.
-- **Memory is temporary and bounded.** There is no saved conversation library, and older messages eventually fall outside the context sent to the model.
-- **Research uses external services.** Questions, recent context, and tool results are sent to OpenAI. Search queries go to DDGS search providers. The calculator and PDF generation run locally.
-- **API calls can incur charges.** Longer conversations and Deep research can require more model calls. This project does not calculate or display usage costs.
-- **The app is intended for local personal use.** It has no login system or access controls for a public deployment.
-- **Exports use basic formatting.** The PDF uses a standalone report layout with clickable source links.
+The app keeps conversations in session memory. Research sends the question, recent context, and tool results to OpenAI. DDGS sends queries to search providers. PDF export runs locally.
 
-
+The Ontario map provides geographic context for research questions. Basemap data comes from [Natural Earth](https://www.naturalearthdata.com/).
